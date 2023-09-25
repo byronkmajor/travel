@@ -1,4 +1,10 @@
+import json
 import googlemaps
+
+# Load API key from config.json
+with open('config.json') as f:
+    config = json.load(f)
+    api_key = config['google_maps_api_key']
 
 # Segment Class: Represents a single segment of a trip
 class Segment:
@@ -47,7 +53,7 @@ class Trip:
 # Client Code: The main function to interact with the user
 def main():
     # Replace with your actual Google Maps API key
-    api_key = "YOUR_GOOGLE_MAPS_API_KEY"
+    
     gmaps = googlemaps.Client(key=api_key)
 
     # Get user input for price per gallon and mpg
