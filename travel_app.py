@@ -1,10 +1,4 @@
-import json
 import googlemaps
-
-# Load API key from config.json
-with open('config.json') as f:
-    config = json.load(f)
-    api_key = config['google_maps_api_key']
 
 # Segment Class: Represents a single segment of a trip
 class Segment:
