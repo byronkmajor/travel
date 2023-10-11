@@ -1,4 +1,11 @@
+import json
 import googlemaps
+
+# Load API key from config.json
+with open('config.json') as f:
+    config = json.load(f)
+    api_key = config['google_maps_api_key']
+
 
 # Segment Class: Represents a single segment of a trip
 class Segment:
@@ -11,7 +18,7 @@ class Segment:
     def calculate_distance(self):
         # Use Google Maps API to get the distance between start and stop addresses
         result = self.gmaps.distance_matrix(self.start_address, self.stop_address, mode="driving")
-        # Extract distance in meters from the API response
+        # Extract distance from the API response
         distance = result['rows'][0]['elements'][0]['distance']['value']
         # Convert distance to miles and return
         return distance * 0.000621371
@@ -46,8 +53,7 @@ class Trip:
 
 # Client Code: The main function to interact with the user
 def main():
-    # Replace with your actual Google Maps API key
-    
+
     gmaps = googlemaps.Client(key=api_key)
 
     # Get user input for price per gallon and mpg

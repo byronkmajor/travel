@@ -1,0 +1,87 @@
+import json
+import googlemaps
+
+# Load API key from config.json
+with open('config.json') as f:
+    config = json.load(f)
+    api_key = config['google_maps_api_key']
+
+# Initialize Google Maps client
+gmaps = googlemaps.Client(key=api_key)
+
+# Segment Class
+class Segment:
+    def __init__(self, start_address, stop_address, gmaps):
+        self.start_address = start_address
+        self.stop_address = stop_address
+        self.gmaps = gmaps
+        self.stops = []
+
+    def add_stop(self, activity, time_spent, cost=0):
+        self.stops.append({"activity": activity, "time_spent": time_spent, "cost": cost})
+
+    def calculate_distance(self):
+        result = self.gmaps.distance_matrix(self.start_address, self.stop_address, mode="driving")
+        distance = result['rows'][0]['elements'][0]['distance']['value']  # distance in meters
+        return distance * 0.000621371  # convert to miles
+
+    def calculate_time(self):
+        return sum(stop["time_spent"] for stop in self.stops)
+
+    def calculate_cost(self):
+        return sum(stop["cost"] for stop in self.stops)
+
+# Trip Class
+class Trip:
+    def __init__(self, price_per_gallon, mpg, gmaps):
+        self.segments = []
+        self.price_per_gallon = price_per_gallon
+        self.mpg = mpg
+        self.gmaps = gmaps
+
+    def add_segment(self, start_address, stop_address):
+        segment = Segment(start_address, stop_address, self.gmaps)
+        self.segments.append(segment)
+
+    def calculate_total_distance(self):
+        return sum(segment.calculate_distance() for segment in self.segments)
+
+    def calculate_total_time(self):
+        return sum(segment.calculate_time() for segment in self.segments)
+
+    def calculate_total_cost(self):
+        gas_needed = (self.calculate_total_distance() / self.mpg)
+        trip_cost = gas_needed * self.price_per_gallon
+        stop_cost = sum(segment.calculate_cost() for segment in self.segments)
+        return trip_cost + stop_cost
+
+# Client Code
+def main():
+    price_per_gallon = float(input("Enter the price per gallon of gas: "))
+    mpg = float(input("Enter the miles per gallon for your vehicle: "))
+    trip = Trip(price_per_gallon, mpg, gmaps)
+
+    while True:
+        start_address = input("Enter the start address for this segment: ")
+        stop_address = input("Enter the stop address for this segment: ")
+        trip.add_segment(start_address, stop_address)
+
+        add_stop = input("Will there be a stop in this segment? (y/n): ")
+        if add_stop.lower() == 'y':
+            activity = input("What will you do at the stop? (Restroom/Food/Drink): ")
+            time_spent = int(input(f"How many minutes will the {activity} stop take? "))
+            cost = 0
+            if activity.lower() in ['food', 'drink']:
+                cost = float(input(f"How much will the {activity} cost? "))
+            trip.segments[-1].add_stop(activity, time_spent, cost)
+
+        more_segments = input("Would you like to add another segment? (y/n): ")
+        if more_segments.lower() != 'y':
+            break
+
+    print(f"\nTotal distance of the trip: {trip.calculate_total_distance():.2f} miles")
+    print(f"Total time spent on stops: {trip.calculate_total_time()} minutes")
+    print(f"Total cost of the trip: ${trip.calculate_total_cost():.2f}")
+
+if __name__ == "__main__":
+    main()
