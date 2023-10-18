@@ -19,7 +19,7 @@ public class TripSegment {
     }
 
     /**
-     * Calculates a simplified (not accurate) distance to another segment
+     * Calculates a simplified distance to another segment
      * using the Euclidean distance formula.
      *
      * @param other The other segment to calculate the distance to.

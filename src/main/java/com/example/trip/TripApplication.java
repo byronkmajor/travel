@@ -26,7 +26,7 @@ public class TripApplication {
         double costPerGallon = scanner.nextDouble();
 
         
-        // do this loop for all of the segements that I want to run
+        // create a list and add each segment to the list. 
         List<TripSegment> segments = new ArrayList<>();
         while (true) {
             System.out.print("Enter latitude number or type 'done'',(d)' to finish: ");
