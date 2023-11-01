@@ -5,11 +5,13 @@ import java.util.List;
 /**
  * a trip has many segmetns, and also the method to calculate total distance and cost. 
  */
-public class Trip {
+public final class Trip {
 
     private List<TripSegment> segments;
     private double milesPerGallon;
     private double costPerGallon;
+
+    private SegmentFactory segmentFactory = SegmentFactory.getInstance();
 
     /**
      * Constructor for creating a new Trip.
