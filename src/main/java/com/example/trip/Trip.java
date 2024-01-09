@@ -3,15 +3,13 @@ package com.example.trip;
 import java.util.List;
 
 /**
- * a trip has many segmetns, and also the method to calculate total distance and cost. 
+ * Represents a trip with multiple segments and methods to calculate total distance and cost.
  */
 public final class Trip {
 
-    private List<TripSegment> segments;
+    private List<SegmentFactory.Segment> segments;
     private double milesPerGallon;
     private double costPerGallon;
-
-    private SegmentFactory segmentFactory = SegmentFactory.getInstance();
 
     /**
      * Constructor for creating a new Trip.
@@ -20,7 +18,7 @@ public final class Trip {
      * @param milesPerGallon The fuel efficiency in miles per gallon.
      * @param costPerGallon  The cost of gasoline per gallon.
      */
-    public Trip(List<TripSegment> segments, double milesPerGallon, double costPerGallon) {
+    public Trip(List<SegmentFactory.Segment> segments, double milesPerGallon, double costPerGallon) {
         this.segments = segments;
         this.milesPerGallon = milesPerGallon;
         this.costPerGallon = costPerGallon;
@@ -32,17 +30,33 @@ public final class Trip {
      * @return The total distance of all segments.
      */
     public double calculateTotalDistance() {
+        if (segments.size() < 2) {
+            return 0;
+        }
+
         double totalDistance = 0;
         for (int i = 0; i < segments.size() - 1; i++) {
-            totalDistance += segments.get(i).distanceTo(segments.get(i + 1));
+            totalDistance += calculateDistance(segments.get(i), segments.get(i + 1));
         }
         return totalDistance;
     }
 
     /**
-     * Calculates the total cost of the trip
-     * based on the fuel efficiency and gasoline cost.
-     * this was the equation from Jerry's white board. 
+     * Calculates the distance between two segments.
+     *
+     * @param from The starting segment.
+     * @param to   The ending segment.
+     * @return The distance between the segments.
+     */
+    private double calculateDistance(SegmentFactory.Segment from, SegmentFactory.Segment to) {
+        double dLatitude = to.getLatitude() - from.getLatitude();
+        double dLongitude = to.getLongitude() - from.getLongitude();
+        return Math.sqrt(dLatitude * dLatitude + dLongitude * dLongitude);
+    }
+
+    /**
+     * Calculates the total cost of the trip based on the fuel efficiency and gasoline cost.
+     *
      * @return The total cost of the trip.
      */
     public double calculateTotalCost() {
